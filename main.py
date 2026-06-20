@@ -57,6 +57,23 @@ async def upload_log(file: UploadFile = File(...)):
         if os.path.exists(file_location):
             os.remove(file_location)
 
+@app.post("/simulate/run")
+async def run_baseline(sim_days: int = 30, num_runs: int = 100):
+    """Run baseline simulation with no what-if patches"""
+    if not os.path.exists("current_params.json"):
+        raise HTTPException(status_code=400, detail="Upload a log first.")
+    
+    with open("current_params.json", "r") as f:
+        params = json.load(f)
+    
+    results = run_simulation(
+        params=params,
+        scenario_patch=None,  # no patches = reality as-is
+        sim_days=sim_days,
+        num_runs=num_runs
+    )
+    return {"status": "success", "results": results}
+
 @app.post("/simulate/whatif")
 async def run_whatif(request: WhatIfRequest):
     """Runs the SimPy simulation with injected variables."""
