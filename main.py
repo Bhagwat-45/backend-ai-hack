@@ -19,6 +19,7 @@ from services.process_miner import extract_simulation_parameters
 from services.simulator import run_simulation
 from services.log_parser import parse_event_log  # Assuming you moved the log parser here
 from services.insight_generator import generate_insights
+from services.blob_storage import upload_csv
 
 
 app = FastAPI(title="Process Mining Simulation Engine")
@@ -81,9 +82,17 @@ async def upload_log(file: UploadFile = File(...), db: Session = Depends(get_db)
         log, df = parse_event_log(file_location)
         params = extract_simulation_parameters(log, df)
 
+        blob_name = f"{uuid.uuid4()}.csv"
+
+        blob_path = upload_csv(
+            file_location,
+            blob_name
+        )
+
         event_log = EventLog(
             filename=file.filename,
             parameters_json=json.dumps(params),
+            blob_path=blob_path
         )
         db.add(event_log)
         db.commit()

@@ -102,7 +102,7 @@ def summarize_parameters(params: Dict) -> str:
     return summary[:MAX_PROMPT_CHARS]
 
 
-def build_messages(params: Dict, history: List, user_message: str) -> List[Dict]:
+def build_messages(params: Dict, history: List, user_message: str,analysis=None) -> List[Dict]:
     """
     Build the OpenAI-style messages list: a system message with the
     summarized process data, the last N turns of history, then the new
@@ -146,6 +146,22 @@ def build_messages(params: Dict, history: List, user_message: str) -> List[Dict]
             "Process Summary:\n\n"
             f"{summarize_parameters(params)}"
         )
+    
+    if analysis:
+        system_content += f"""
+Additional Case-Level Analysis
+The results below are computed directly from the event log.
+Treat these results as factual evidence.
+Do not infer root causes unless the evidence explicitly supports them.
+Analysis Type:
+{analysis["analysis_type"]}
+Results:
+{analysis["results"]}
+IMPORTANT:
+- These results were computed directly from the raw event log.
+- Use them when answering the user's question.
+- Prefer these results over generic process summaries if they are directly relevant.
+"""
 
     messages = [{"role": "system", "content": system_content}]
 

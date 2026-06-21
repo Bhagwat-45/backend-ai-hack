@@ -22,14 +22,14 @@ class EventLog(Base):
     filename = Column(String, nullable=False)
     uploaded_at = Column(DateTime, default=_now, nullable=False)
 
-    # Output of extract_simulation_parameters(), as a JSON string.
-    # This is what /simulate/run and /simulate/whatif now read instead of
-    # current_params.json, and what the chat feature summarizes into a
-    # prompt instead of dumping raw event rows.
     parameters_json = Column(Text, nullable=False)
 
+    blob_path = Column(String, nullable=True)
+
     conversations = relationship(
-        "Conversation", back_populates="event_log", cascade="all, delete-orphan"
+        "Conversation",
+        back_populates="event_log",
+        cascade="all, delete-orphan"
     )
 
 
