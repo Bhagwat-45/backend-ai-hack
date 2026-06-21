@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+python-multipart
+pm4py
+pandas
+numpy
+scipy
+simpy
+openai
+python-dotenv
